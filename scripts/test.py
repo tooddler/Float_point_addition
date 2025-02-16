@@ -4,11 +4,11 @@ def main2():
     """ fp32 test. """
     data1 = np.float32(10 * np.random.rand())
     data2 = np.float32(10 * np.random.rand())
-    rlst0 = data2 * data1
+    rlst0 = data2 + data1
 
     data3 = np.float32(10 * np.random.rand())
     data4 = np.float32(10 * np.random.rand())
-    rlst1 = data3 * data4
+    rlst1 = data3 + data4
 
     value = [data1, data2, data3, data4, rlst0, rlst1]
     weight_bin_data = np.stack(value)
