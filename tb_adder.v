@@ -19,7 +19,7 @@ wire [31:0]             rlst_1        ;
 initial s_clk = 1'b1;
 always #(`CLK_PERIOD/2) s_clk = ~s_clk;
 
-parameter data_path = "./scripts/fp32_test.bin";
+parameter data_path = "E:/Desktop/code/Float_point_addition/scripts/fp32_test.bin";
 
 integer file, o, addr;
 reg [31 : 0]                 fp32_data [5:0]     ;
