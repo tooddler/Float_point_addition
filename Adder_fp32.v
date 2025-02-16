@@ -37,6 +37,12 @@ wire signed [9:0]   w_expo_data2_0  ;
 wire [25:0]         w_mant_data1_0  ;
 wire [25:0]         w_mant_data2_0  ;
 
+wire [7:0]          w_exponent_diff1;
+wire [7:0]          w_exponent_diff2;
+
+wire [25:0]         w_shift_out1    ;
+wire [25:0]         w_shift_out2    ;
+
 // --- reg ---
 reg [5:0]           r_data_valid_dly;
 
@@ -77,6 +83,9 @@ assign w_expo_data2_0 = (r_data2[30:23] == 8'h00) ? -127 : (r_data2[30:23] - 127
 // -- Mantissa cal (fraction proc
 assign w_mant_data1_0 = (r_data1[30:23] == 8'h00) ? {1'b0, r_data1[22:0], 2'b0} : {2'b01, r_data1[22:0], 1'b0};
 assign w_mant_data2_0 = (r_data2[30:23] == 8'h00) ? {1'b0, r_data2[22:0], 2'b0} : {2'b01, r_data2[22:0], 1'b0};
+
+assign w_exponent_diff1 = r_data2[30:23] - r_data1[30:23];
+assign w_exponent_diff2 = r_data1[30:23] - r_data2[30:23];
 
 // out 
 assign o_data[31]     = r_sign_5            ;
@@ -137,7 +146,7 @@ always@(posedge s_clk) begin
         r_expo_max_1 <= w_expo_data1_0;
         r_sign_max_1 <= r_data1[31];
 
-        r_mant_min_1 <= w_mant_data2_0 >> (r_data1[30:23]-r_data2[30:23]);
+        r_mant_min_1 <= w_shift_out2;
         r_sign_min_1 <= r_data2[31];
     end
     else begin
@@ -145,7 +154,7 @@ always@(posedge s_clk) begin
         r_expo_max_1 <= w_expo_data2_0;
         r_sign_max_1 <= r_data2[31];
 
-        r_mant_min_1 <= w_mant_data1_0 >>(r_data2[30:23]-r_data1[30:23]);
+        r_mant_min_1 <= w_shift_out1;
         r_sign_min_1 <= r_data1[31];
     end
 end
@@ -280,6 +289,18 @@ always @(posedge s_clk) begin
         r_sign_5 <= r_sign_4;
     end
 end
+
+variable_shift u_shift_m00(
+    .i_num_shifts  ( w_exponent_diff2   ),
+    .i_TargetData  ( w_mant_data2_0     ),
+    .o_data_out    ( w_shift_out2       )
+);
+
+variable_shift u_shift_m01(
+    .i_num_shifts  ( w_exponent_diff1   ),
+    .i_TargetData  ( w_mant_data1_0     ),
+    .o_data_out    ( w_shift_out1       )
+);
 
 // // debug wire
 // wire [7:0]   exponent_data1 = i_data1[30:23];
